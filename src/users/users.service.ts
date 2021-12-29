@@ -5,15 +5,13 @@ import { User } from './users.model';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User) private userRepository: typeof User) {}
+  constructor(@InjectModel(User) private userRepository: typeof User) {}
 
-    async createUser(dto: CreateUserDTO) {
-        const user = await this.userRepository.create(dto);
-        return user;
-    }
+  createUser(dto: CreateUserDTO): Promise<User> {
+    return this.userRepository.create(dto);
+  }
 
-    async getAllUsers() {
-        const users = await this.userRepository.findAll();
-        return users;
-    }
+  getAllUsers(): Promise<User[]> {
+    return this.userRepository.findAll();
+  }
 }
