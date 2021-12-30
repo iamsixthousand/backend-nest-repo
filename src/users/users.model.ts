@@ -11,6 +11,7 @@ import { UserRoles } from 'src/user-roles/user-roles.model';
 
 interface UserCreateAttr {
   email: string;
+  username: string;
   password: string;
 }
 
@@ -31,6 +32,10 @@ export class User extends Model<User, UserCreateAttr> {
   })
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
   email: string;
+
+  @ApiProperty({ example: '6000', description: 'user name' })
+  @Column({ type: DataType.STRING, unique: true, allowNull: false })
+  username: string;
 
   @ApiProperty({ example: '123rrEdsd2', description: 'password string' })
   @Column({ type: DataType.STRING, allowNull: false })
