@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesService } from 'src/roles/roles.service';
 import { ChangeRoleDTO } from 'src/user-roles/dto/change-role.dto';
@@ -19,9 +19,15 @@ export class UsersService {
 
   async setRole(username: string, changeRoleDTO: ChangeRoleDTO): Promise<User> {
     const user = await this.userRepository.findOne({ where: { username } });
-    const role = await this.rolesService.getRoleByValue(changeRoleDTO.role);
-    user.$set('roles', role.id);
-    return user;
+      if (user) {
+        const role = await this.rolesService.getRoleByValue(changeRoleDTO.role);
+        if (role) {
+          user.$set('roles', role.id);
+          return user;
+        }
+        throw new HttpException('no such role', HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException('no such user', HttpStatus.BAD_REQUEST);
   }
 
   getUserByEmail(email: string): Promise<User> {
