@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Messages } from 'src/@core/strings';
 import { ChangeRoleDTO } from 'src/user-roles/dto/change-role.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { User } from './users.model';
@@ -35,9 +36,6 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [User] })
   @Delete('/:username')
   deleteUser(@Param('username') username: string) {
-    this.usersService.deleteUser(username);
-    return {
-      message: `user ${username} has been deleted`,
-    }
+    return this.usersService.deleteUser(username);
   }
 }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Exceptions, Messages } from 'src/@core/strings';
 import { RolesService } from 'src/roles/roles.service';
 import { ChangeRoleDTO } from 'src/user-roles/dto/change-role.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -12,8 +13,8 @@ export class UsersService {
   async createUser(dto: CreateUserDTO): Promise<User> {
     const user = await this.userRepository.create(dto);
     const role = await this.rolesService.getRoleByValue("USER");
-    user.$set('roles', [role.id]);
-    user.roles = [role];
+    user.$set('role', role.id);
+    user.role = role;
     return user;
   }
 
@@ -22,12 +23,12 @@ export class UsersService {
       if (user) {
         const role = await this.rolesService.getRoleByValue(changeRoleDTO.role);
         if (role) {
-          user.$set('roles', role.id);
+          user.$set('role', role.id);
           return user;
         }
-        throw new HttpException('no such role', HttpStatus.BAD_REQUEST);
+        throw new HttpException(Exceptions.noRole, HttpStatus.BAD_REQUEST);
       }
-      throw new HttpException('no such user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(Exceptions.noUser, HttpStatus.BAD_REQUEST);
   }
 
   getUserByEmail(email: string): Promise<User> {
@@ -38,7 +39,16 @@ export class UsersService {
     return this.userRepository.findAll({ include: { all: true } });
   }
 
-  deleteUser(username: string) {
-    return this.userRepository.destroy({where: {username}})
+  async deleteUser(username: string) {
+    if (username) {
+      const rows = await this.userRepository.destroy({where: {username}})
+      return {
+        message: `${username} ` + Messages.userDeleted,
+        rows: rows,
+      }
+    }
+    return {
+      message: Exceptions.noUser,
+    }
   }
 }

@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.model';
+import { Exceptions } from 'src/@core/strings';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     async register(userDto: CreateUserDTO) {
         const newUser = await this.userService.getUserByEmail(userDto.email);
         if (newUser) {
-            throw new HttpException('This email is already in use', HttpStatus.BAD_REQUEST);
+            throw new HttpException(Exceptions.emailInUse, HttpStatus.BAD_REQUEST);
         }
         const hashPassword = await bcrypt.hash(userDto.password, 5);
         const user = await this.userService.createUser({ ...userDto, password: hashPassword });
@@ -25,7 +26,7 @@ export class AuthService {
     }
 
     private async generateToken(user: User) {
-        const payload = { email: user.email, username: user.username, id: user.id, roles: user.roles }
+        const payload = { email: user.email, username: user.username, id: user.id, roles: user.role }
         return {
             token: this.jwtService.sign(payload),
         }
@@ -38,9 +39,9 @@ export class AuthService {
             if (passwordsEqual) {
                 return user;
             }
-            throw new UnauthorizedException({message: 'Invalid email or password'});
+            throw new UnauthorizedException({message: Exceptions.invEmailOrPassword});
         }
-        throw new UnauthorizedException({message: 'Invalid email or password'});       
+        throw new UnauthorizedException({message: Exceptions.invEmailOrPassword});       
     }
 
 }
