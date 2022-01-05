@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Messages } from 'src/@core/strings';
+import { ChangeRoleDTO } from 'src/user-roles/dto/change-role.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { User } from './users.model';
 import { UsersService } from './users.service';
@@ -16,10 +18,24 @@ export class UsersController {
     return this.usersService.createUser(userDto);
   }
 
+  @ApiOperation({ summary: 'set role' })
+  @ApiResponse({ status: 200, type: User })
+  @Put('/:username')
+  setRole(@Param('username') username: string, @Body() changeRoleDTO: ChangeRoleDTO) {
+    return this.usersService.setRole(username, changeRoleDTO);
+  }
+
   @ApiOperation({ summary: 'get users list' })
   @ApiResponse({ status: 200, type: [User] })
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();
+  }
+
+  @ApiOperation({ summary: 'delete user' })
+  @ApiResponse({ status: 200, type: [User] })
+  @Delete('/:username')
+  deleteUser(@Param('username') username: string) {
+    return this.usersService.deleteUser(username);
   }
 }
