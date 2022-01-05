@@ -9,7 +9,7 @@ import { RolesService } from './roles.service';
 export class RolesController {
   constructor(private rolesService: RolesService) {}
 
-  @ApiOperation({ summary: 'user creation' })
+  @ApiOperation({ summary: 'role creation' })
   @ApiResponse({ status: 200, type: Role })
   @Post()
   create(@Body() roleDto: CreateRoleDTO) {
