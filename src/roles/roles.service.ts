@@ -5,17 +5,17 @@ import { Role } from './roles.model';
 
 @Injectable()
 export class RolesService {
-  constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
+    constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
-  createRole(dto: CreateRoleDTO): Promise<Role> {
-    return this.roleRepository.create(dto);
-  }
+    createRole(dto: CreateRoleDTO): Promise<Role> {
+        return this.roleRepository.create(dto);
+    }
 
-  getRoleByValue(value: string): Promise<Role> {
-    return this.roleRepository.findOne({ where: { value } });
-  }
+    getRoleByValue(value: string): Promise<Role> {
+        return this.roleRepository.findOne({ where: { value } });
+    }
 
-  getAllRoles(): Promise<Role[]> {
-    return this.roleRepository.findAll();
-  }
+    getAllRoles(): Promise<Role[]> {
+        return this.roleRepository.findAll();
+    }
 }
