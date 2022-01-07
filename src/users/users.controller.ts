@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Messages } from 'src/@core/strings';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -12,7 +21,7 @@ import { UsersService } from './users.service';
 @ApiTags('Users interaction')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService) {}
 
   @ApiOperation({ summary: 'user creation' })
   @ApiResponse({ status: 200, type: User })

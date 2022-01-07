@@ -8,18 +8,24 @@ import { User } from './users.model';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User) private userRepository: typeof User, private rolesService: RolesService) { }
+  constructor(
+    @InjectModel(User) private userRepository: typeof User,
+    private rolesService: RolesService,
+  ) {}
 
   async createUser(userDto: CreateUserDTO): Promise<User> {
     try {
       const user = await this.userRepository.create(userDto);
-      const role = await this.rolesService.getRoleByValue("USER");
+      const role = await this.rolesService.getRoleByValue('USER');
       // console.log(user)
       // console.log(role)
       user.$set('role', role.id);
       return user;
     } catch (error) {
-      throw new HttpException({message: Exceptions.userExists}, HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        { message: Exceptions.userExists },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -37,11 +43,17 @@ export class UsersService {
   }
 
   getUserByEmail(email: string): Promise<User> {
-    return this.userRepository.findOne({ where: { email }, include: { all: true } });
+    return this.userRepository.findOne({
+      where: { email },
+      include: { all: true },
+    });
   }
 
   getUserByUsername(username: string): Promise<User> {
-    return this.userRepository.findOne({ where: { username }, include: { all: true } });
+    return this.userRepository.findOne({
+      where: { username },
+      include: { all: true },
+    });
   }
 
   getAllUsers(): Promise<User[]> {
@@ -50,14 +62,14 @@ export class UsersService {
 
   async deleteUser(username: string) {
     if (username) {
-      const rows = await this.userRepository.destroy({ where: { username } })
+      const rows = await this.userRepository.destroy({ where: { username } });
       return {
         message: `${username} ` + Messages.userDeleted,
         rows: rows,
-      }
+      };
     }
     return {
       message: Exceptions.noUser,
-    }
+    };
   }
 }

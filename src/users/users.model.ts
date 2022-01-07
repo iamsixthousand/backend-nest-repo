@@ -52,7 +52,7 @@ export class User extends Model<User, UserCreateAttr> {
   banReason: string;
 
   @ForeignKey(() => Role)
-  roleId: number
+  roleId: number;
 
   @BelongsTo(() => Role)
   role: Role;

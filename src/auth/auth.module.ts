@@ -13,12 +13,9 @@ import { AuthService } from './auth.service';
       secret: `${process.env.PRIVATE_KEY}`,
       signOptions: {
         expiresIn: '24h',
-      }
-    })
+      },
+    }),
   ],
-  exports: [
-    AuthService,
-    JwtModule,
-  ]
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
