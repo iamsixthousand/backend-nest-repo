@@ -1,6 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Messages } from 'src/@core/strings';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles-auth.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { ChangeRoleDTO } from 'src/user-roles/dto/change-role.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { User } from './users.model';
@@ -9,7 +12,7 @@ import { UsersService } from './users.service';
 @ApiTags('Users interaction')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   @ApiOperation({ summary: 'user creation' })
   @ApiResponse({ status: 200, type: User })
@@ -30,6 +33,9 @@ export class UsersController {
 
   @ApiOperation({ summary: 'get users list' })
   @ApiResponse({ status: 200, type: [User] })
+  // @UseGuards(JwtAuthGuard)
+  @Roles(1)
+  @UseGuards(RolesGuard)
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();

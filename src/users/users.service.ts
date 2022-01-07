@@ -10,29 +10,38 @@ import { User } from './users.model';
 export class UsersService {
   constructor(@InjectModel(User) private userRepository: typeof User, private rolesService: RolesService) { }
 
-  async createUser(dto: CreateUserDTO): Promise<User> {
-    const user = await this.userRepository.create(dto);
-    const role = await this.rolesService.getRoleByValue("USER");
-    user.$set('role', role.id);
-    // user.role = role;
-    return user;
+  async createUser(userDto: CreateUserDTO): Promise<User> {
+    try {
+      const user = await this.userRepository.create(userDto);
+      const role = await this.rolesService.getRoleByValue("USER");
+      // console.log(user)
+      // console.log(role)
+      user.$set('role', role.id);
+      return user;
+    } catch (error) {
+      throw new HttpException({message: Exceptions.userExists}, HttpStatus.BAD_REQUEST)
+    }
   }
 
   async setRole(username: string, changeRoleDTO: ChangeRoleDTO): Promise<User> {
     const user = await this.userRepository.findOne({ where: { username } });
-      if (user) {
-        const role = await this.rolesService.getRoleByValue(changeRoleDTO.role);
-        if (role) {
-          user.$set('role', role.id);
-          return user;
-        }
-        throw new HttpException(Exceptions.noRole, HttpStatus.BAD_REQUEST);
+    if (user) {
+      const role = await this.rolesService.getRoleByValue(changeRoleDTO.role);
+      if (role) {
+        user.$set('role', role.id);
+        return user;
       }
-      throw new HttpException(Exceptions.noUser, HttpStatus.BAD_REQUEST);
+      throw new HttpException(Exceptions.noRole, HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException(Exceptions.noUser, HttpStatus.BAD_REQUEST);
   }
 
   getUserByEmail(email: string): Promise<User> {
     return this.userRepository.findOne({ where: { email }, include: { all: true } });
+  }
+
+  getUserByUsername(username: string): Promise<User> {
+    return this.userRepository.findOne({ where: { username }, include: { all: true } });
   }
 
   getAllUsers(): Promise<User[]> {
@@ -41,7 +50,7 @@ export class UsersService {
 
   async deleteUser(username: string) {
     if (username) {
-      const rows = await this.userRepository.destroy({where: {username}})
+      const rows = await this.userRepository.destroy({ where: { username } })
       return {
         message: `${username} ` + Messages.userDeleted,
         rows: rows,

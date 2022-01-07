@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
+  ForeignKey,
   Model,
   Table,
 } from 'sequelize-typescript';
@@ -49,6 +51,9 @@ export class User extends Model<User, UserCreateAttr> {
   @Column({ type: DataType.STRING, allowNull: true })
   banReason: string;
 
-  @BelongsToMany(() => Role, () => UserRoles)
+  @ForeignKey(() => Role)
+  roleId: number
+
+  @BelongsTo(() => Role)
   role: Role;
 }

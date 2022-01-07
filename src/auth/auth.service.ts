@@ -4,7 +4,7 @@ import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.model';
-import { Exceptions } from 'src/@core/strings';
+import { Exceptions, Messages } from 'src/@core/strings';
 
 @Injectable()
 export class AuthService {
@@ -16,32 +16,51 @@ export class AuthService {
     }
 
     async register(userDto: CreateUserDTO) {
-        const newUser = await this.userService.getUserByEmail(userDto.email);
-        if (newUser) {
+        const checkEmail = await this.userService.getUserByEmail(userDto.email);
+        if (checkEmail) {
             throw new HttpException(Exceptions.emailInUse, HttpStatus.BAD_REQUEST);
+        } else {
+            const checkUsername = await this.userService.getUserByUsername(userDto.username);
+            if (checkUsername) {
+                throw new HttpException(Exceptions.usernameInUse, HttpStatus.BAD_REQUEST);
+            }
+            else {
+                const hashPassword = await bcrypt.hash(userDto.password, 5);
+                const user = await this.userService.createUser({ ...userDto, password: hashPassword });
+                return this.generateToken(user);
+            }
         }
-        const hashPassword = await bcrypt.hash(userDto.password, 5);
-        const user = await this.userService.createUser({ ...userDto, password: hashPassword });
-        return this.generateToken(user);
     }
 
     private async generateToken(user: User) {
-        const payload = { email: user.email, username: user.username, id: user.id, roles: user.role }
+        const payload = { email: user.email, username: user.username, id: user.id, role: user.role }
         return {
             token: this.jwtService.sign(payload),
         }
     }
 
-    private async userValidation(userDto: CreateUserDTO) {
-        const user = await this.userService.getUserByEmail(userDto.email);
-        if (user) {
-            const passwordsEqual = await bcrypt.compare(userDto.password, user.password);
-            if (passwordsEqual) {
-                return user;
-            }
-            throw new UnauthorizedException({message: Exceptions.invEmailOrPassword});
-        }
-        throw new UnauthorizedException({message: Exceptions.invEmailOrPassword});       
+    private bcryptValidation(inputPW: string, existingPW: string) {
+        return bcrypt.compare(inputPW, existingPW);
     }
 
+    private async userValidation(userDto: CreateUserDTO) {
+        let user: User;
+        if (userDto.email) {
+            user = await this.userService.getUserByEmail(userDto.email);
+            if (user) {
+                const passwordsEqual = this.bcryptValidation(userDto.password, user.password);
+                if (passwordsEqual) {
+                    return user;
+                }
+                throw new UnauthorizedException({ message: Exceptions.invEmailOrPassword });
+            }
+            throw new UnauthorizedException({ message: Exceptions.invEmailOrPassword });
+        }
+        user = await this.userService.getUserByUsername(userDto.username);
+        const passwordsEqual = this.bcryptValidation(userDto.password, user.password);
+        if (passwordsEqual) {
+            return user;
+        }
+        throw new UnauthorizedException({ message: Exceptions.invUsernameOrPassword });
+    }
 }
