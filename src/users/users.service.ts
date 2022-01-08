@@ -10,33 +10,31 @@ import { User } from './users.model';
 export class UsersService {
     constructor(
         @InjectModel(User) private userRepository: typeof User,
-        private rolesService: RolesService,
+        private rolesService: RolesService
     ) {}
 
     async createUser(userDto: CreateUserDTO): Promise<User> {
         try {
             const user = await this.userRepository.create(userDto);
             const role = await this.rolesService.getRoleByValue('USER');
-            // console.log(user)
-            // console.log(role)
             user.$set('role', role.id);
             return user;
         } catch (error) {
             throw new HttpException(
                 { message: Exceptions.userExists },
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST
             );
         }
     }
 
     async setRole(
         username: string,
-        changeRoleDTO: ChangeRoleDTO,
+        changeRoleDTO: ChangeRoleDTO
     ): Promise<User> {
         const user = await this.userRepository.findOne({ where: { username } });
         if (user) {
             const role = await this.rolesService.getRoleByValue(
-                changeRoleDTO.role,
+                changeRoleDTO.role
             );
             if (role) {
                 user.$set('role', role.id);

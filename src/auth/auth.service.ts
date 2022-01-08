@@ -15,7 +15,7 @@ import { Exceptions, Messages } from 'src/@core/strings';
 export class AuthService {
     constructor(
         private userService: UsersService,
-        private jwtService: JwtService,
+        private jwtService: JwtService
     ) {}
 
     async login(userDto: CreateUserDTO) {
@@ -28,16 +28,16 @@ export class AuthService {
         if (checkEmail) {
             throw new HttpException(
                 Exceptions.emailInUse,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST
             );
         } else {
             const checkUsername = await this.userService.getUserByUsername(
-                userDto.username,
+                userDto.username
             );
             if (checkUsername) {
                 throw new HttpException(
                     Exceptions.usernameInUse,
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.BAD_REQUEST
                 );
             } else {
                 const hashPassword = await bcrypt.hash(userDto.password, 5);
@@ -73,7 +73,7 @@ export class AuthService {
             if (user) {
                 const passwordsEqual = this.bcryptValidation(
                     userDto.password,
-                    user.password,
+                    user.password
                 );
                 if (passwordsEqual) {
                     return user;
@@ -89,7 +89,7 @@ export class AuthService {
         user = await this.userService.getUserByUsername(userDto.username);
         const passwordsEqual = this.bcryptValidation(
             userDto.password,
-            user.password,
+            user.password
         );
         if (passwordsEqual) {
             return user;

@@ -33,10 +33,8 @@ export class UsersController {
     @ApiOperation({ summary: 'set role' })
     @ApiResponse({ status: 200, type: User })
     @Put('/:username')
-    setRole(
-        @Param('username') username: string,
-        @Body() changeRoleDTO: ChangeRoleDTO,
-    ) {
+    setRole(@Param('username') username: string,
+        @Body() changeRoleDTO: ChangeRoleDTO) {
         return this.usersService.setRole(username, changeRoleDTO);
     }
 
