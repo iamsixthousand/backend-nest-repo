@@ -1,5 +1,5 @@
-import { SetMetadata } from "@nestjs/common"
+import { SetMetadata } from '@nestjs/common';
 
-export const ROLE_KEY = 'role'
+export const ROLE_KEY = 'role';
 
-export const Roles = (...roles: number[]) => SetMetadata(ROLE_KEY, roles)
+export const RequiredRoles = (...roles: number[]) => SetMetadata(ROLE_KEY, roles); // add custom decorator

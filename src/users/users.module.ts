@@ -9,15 +9,13 @@ import { User } from './users.model';
 import { UsersService } from './users.service';
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService],
-  imports: [
-    SequelizeModule.forFeature([User, Role, UserRoles]),
-    RolesModule,
-    forwardRef(() => AuthModule),
-  ],
-  exports: [
-    UsersService,
-  ]
+    controllers: [UsersController],
+    providers: [UsersService],
+    imports: [
+        SequelizeModule.forFeature([User, Role, UserRoles]),
+        RolesModule,
+        forwardRef(() => AuthModule),
+    ],
+    exports: [UsersService],
 })
 export class UsersModule {}
