@@ -11,8 +11,8 @@ export class RolesService {
         return this.roleRepository.create(dto);
     }
 
-    getRoleByValue(value: string): Promise<Role> {
-        return this.roleRepository.findOne({ where: { value } });
+    getRoleById(id: number): Promise<Role> {
+        return this.roleRepository.findOne({ where: { id } });
     }
 
     getAllRoles(): Promise<Role[]> {

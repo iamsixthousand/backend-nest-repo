@@ -15,16 +15,16 @@ import { ROLE_KEY } from './roles-auth.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private jwtService: JwtService, private reflector: Reflector) { }
+    constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    canActivate(
+        context: ExecutionContext
+    ): boolean | Promise<boolean> | Observable<boolean> {
         try {
-            const requiredRoles = this.reflector
-                .getAllAndOverride<number[]>(
-                    ROLE_KEY, [
-                    context.getHandler(),
-                    context.getClass(), // two in array for reflector
-                ]);
+            const requiredRoles = this.reflector.getAllAndOverride<number[]>(ROLE_KEY, [
+                context.getHandler(),
+                context.getClass(), // two in array for reflector
+            ]);
             if (!requiredRoles) {
                 return true;
             }

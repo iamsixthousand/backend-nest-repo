@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RequiredRoles } from 'src/auth/roles-auth.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { CreateRoleDTO } from './dto/create-role.dto';
 import { Role } from './roles.model';
 import { RolesService } from './roles.service';
@@ -12,21 +14,23 @@ export class RolesController {
     @ApiOperation({ summary: 'role creation' })
     @ApiResponse({ status: 200, type: Role })
     @Post()
-    create(@Body() roleDto: CreateRoleDTO) {
+    create(@Body() roleDto: CreateRoleDTO): Promise<Role> {
         return this.rolesService.createRole(roleDto);
     }
 
     @ApiOperation({ summary: 'get role' })
     @ApiResponse({ status: 200, type: Role })
-    @Get('/:value')
-    getByValue(@Param('value') value: string) {
-        return this.rolesService.getRoleByValue(value);
+    @Get('/:id')
+    getRoleById(@Param('id') id: number): Promise<Role> {
+        return this.rolesService.getRoleById(id);
     }
 
     @ApiOperation({ summary: 'get all roles' })
     @ApiResponse({ status: 200, type: [Role] })
+    @RequiredRoles(1)
+    @UseGuards(RolesGuard)
     @Get()
-    getAllRoles() {
+    getAllRoles(): Promise<Role[]> {
         return this.rolesService.getAllRoles();
     }
 }
